@@ -57,7 +57,7 @@ export default function Map({ center = [91.7362, 26.1445] }: MapProps) {
   const loadSafetyData = async () => {
     const response = await fetch('/pincode_coordinates_with_safety_scores.csv');
     const text = await response.text();
-    
+
     return new Promise<SafetyData[]>((resolve) => {
       Papa.parse(text, {
         header: true,
@@ -74,7 +74,7 @@ export default function Map({ center = [91.7362, 26.1445] }: MapProps) {
     });
   };
 
-    const getColorFromScore = (score: number, minScore: number, maxScore: number) => {
+  const getColorFromScore = (score: number, minScore: number, maxScore: number) => {
     const normalizedScore = (score - minScore) / (maxScore - minScore);
     // Brighter color scale from red (unsafe) to green (safe)
     const colors = [
@@ -84,14 +84,14 @@ export default function Map({ center = [91.7362, 26.1445] }: MapProps) {
       { threshold: 0.75, color: '#FFFF00' }, // Bright yellow
       { threshold: 1, color: '#00FF00' }     // Bright green for safest
     ];
-    
+
     for (let i = 1; i < colors.length; i++) {
       if (normalizedScore <= colors[i].threshold) {
         return colors[i - 1].color;
       }
     }
     return colors[colors.length - 1].color;
-  };  const addHeatmapLayer = (data: SafetyData[]) => {
+  }; const addHeatmapLayer = (data: SafetyData[]) => {
     if (!map.current) return;
 
     const maxScore = Math.max(...data.map(d => d.safety_score));
@@ -183,35 +183,36 @@ export default function Map({ center = [91.7362, 26.1445] }: MapProps) {
     });
 
     // Add click interaction
-    map.current.on('click', 'safety-points', (e: any) => {
-      if (!e.features?.[0]?.geometry?.coordinates) return;
-      
-      const coordinates = e.features[0].geometry.coordinates.slice();
-      const safetyScore = e.features[0].properties?.safety_score;
+    map.current.on('click', 'safety-points', (e: tt.MapLayerMouseEvent<'click'>) => {
+      const feature = e.features?.[0];
+      if (!feature || feature.geometry.type !== 'Point') return; // type guard
+
+      const point = feature.geometry as GeoJSON.Point;
+      const coordinates = new tt.LngLat(point.coordinates[0], point.coordinates[1]);
+      const safetyScore = feature.properties?.safety_score;
       if (!safetyScore) return;
-      
-      // Create popup content
+
       const popupContent = `
-        <div class="p-2">
-          <h3 class="font-bold mb-1">Safety Information</h3>
-          <p>Safety Score: ${Number(safetyScore).toFixed(2)}</p>
-          <p>Risk Level: ${Number(safetyScore) < 0.3 ? 'High' : Number(safetyScore) < 0.7 ? 'Medium' : 'Low'}</p>
-        </div>
-      `;
-      
-      if (map.current) {
-        new tt.Popup()
-          .setLngLat(coordinates)
-          .setHTML(popupContent)
-          .addTo(map.current);
-      }
+    <div class="p-2">
+      <h3 class="font-bold mb-1">Safety Information</h3>
+      <p>Safety Score: ${Number(safetyScore).toFixed(2)}</p>
+      <p>Risk Level: ${Number(safetyScore) < 0.3
+          ? 'High'
+          : Number(safetyScore) < 0.7
+            ? 'Medium'
+            : 'Low'
+        }</p>
+    </div>
+  `;
+
+      new tt.Popup().setLngLat(coordinates).setHTML(popupContent).addTo(map.current!);
     });
 
     // Change cursor on hover
     map.current.on('mouseenter', 'safety-points', () => {
       if (map.current) map.current.getCanvas().style.cursor = 'pointer';
     });
-    
+
     map.current.on('mouseleave', 'safety-points', () => {
       if (map.current) map.current.getCanvas().style.cursor = '';
     });
@@ -239,7 +240,7 @@ export default function Map({ center = [91.7362, 26.1445] }: MapProps) {
       const guwahatiPoints = safetyData.filter(point => {
         // More precise Guwahati boundaries based on heatmap data
         return point.longitude >= 91.71 && point.longitude <= 91.78 &&
-               point.latitude >= 26.11 && point.latitude <= 26.18;
+          point.latitude >= 26.11 && point.latitude <= 26.18;
       });
 
       // Group points by risk level
@@ -349,17 +350,17 @@ export default function Map({ center = [91.7362, 26.1445] }: MapProps) {
       let frame = 0;
       let lastMoveTime = Date.now();
       let currentTourists = [...updatedTourists];
-      
+
       const animate = () => {
         const currentTime = Date.now();
         frame = (frame + 1) % 120; // Slower pulse cycle
-        
+
         // Update positions every 5-10 seconds (random interval)
         if (currentTime - lastMoveTime > (5000 + Math.random() * 5000)) {
           currentTourists = updateTouristPositions(currentTourists);
           lastMoveTime = currentTime;
         }
-        
+
         const features = currentTourists.map(tourist => ({
           type: 'Feature',
           properties: {
@@ -375,61 +376,59 @@ export default function Map({ center = [91.7362, 26.1445] }: MapProps) {
         }));
 
         if (map.current?.getSource('tourists')) {
-          (map.current.getSource('tourists') as any).setData({
-            type: 'FeatureCollection',
-            features
-          });
+          const source = map.current.getSource('tourists') as tt.GeoJSONSource;
+          // source.setData();
         }
-        
+
         requestAnimationFrame(animate);
       };
-      
+
       animate();
 
       // Add click handler for tourist markers
-      map.current.on('click', 'tourists-layer', (e: any) => {
-        if (!e.features?.[0]?.properties) return;
-        
-        const { id, name, lastSeen } = e.features[0].properties;
-        const coordinates = e.features[0].geometry.coordinates.slice();
+      map.current.on('click', 'tourists-layer', (e: tt.MapLayerMouseEvent<'click'>) => {
+        const feature = e.features?.[0];
+        if (!feature || !feature.properties) return;
+        if (feature.geometry.type !== 'Point') return; // ensure coordinates exist
 
-        // Create popup content
+        const { id, name, lastSeen } = feature.properties;
+        const point = feature.geometry as GeoJSON.Point;
+const coordinates = new tt.LngLat(point.coordinates[0], point.coordinates[1]);
+
+
         const popupContent = `
-          <div class="p-4 min-w-[250px] bg-white/95 backdrop-blur-sm">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">
-                ${name.charAt(0)}
-              </div>
-              <div>
-                <h3 class="font-bold text-lg text-gray-900">${name}</h3>
-                <p class="text-sm text-gray-500">Tourist ID: ${id}</p>
-              </div>
-            </div>
-            <div class="space-y-2 mb-4">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <p class="text-sm text-gray-600">Last seen: ${lastSeen}</p>
-              </div>
-              <div class="text-sm text-gray-500">Current Location: Active Zone</div>
-            </div>
-            <a href="/police/tourist-details/${id}" 
-               class="block w-full text-center bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors shadow-sm">
-              View Tourist Details
-            </a>
-          </div>
-        `;
-        
-        new tt.Popup()
-          .setLngLat(coordinates)
-          .setHTML(popupContent)
-          .addTo(map.current!);
+    <div class="p-4 min-w-[250px] bg-white/95 backdrop-blur-sm">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">
+          ${name.charAt(0)}
+        </div>
+        <div>
+          <h3 class="font-bold text-lg text-gray-900">${name}</h3>
+          <p class="text-sm text-gray-500">Tourist ID: ${id}</p>
+        </div>
+      </div>
+      <div class="space-y-2 mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <p class="text-sm text-gray-600">Last seen: ${lastSeen}</p>
+        </div>
+        <div class="text-sm text-gray-500">Current Location: Active Zone</div>
+      </div>
+      <a href="/police/tourist-details/${id}" 
+         class="block w-full text-center bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors shadow-sm">
+        View Tourist Details
+      </a>
+    </div>
+  `;
+
+        new tt.Popup().setLngLat(coordinates).setHTML(popupContent).addTo(map.current!);
       });
 
       // Change cursor on hover for tourist markers
       map.current.on('mouseenter', 'tourists-layer', () => {
         if (map.current) map.current.getCanvas().style.cursor = 'pointer';
       });
-      
+
       map.current.on('mouseleave', 'tourists-layer', () => {
         if (map.current) map.current.getCanvas().style.cursor = '';
       });

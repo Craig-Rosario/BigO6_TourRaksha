@@ -278,11 +278,14 @@ export default function OptimizedMap({
       closeOnClick: false
     });
 
-    map.current.on('mouseenter', 'safety-points', (e: any) => {
+    map.current.on('mouseenter', 'safety-points', (e: tt.MapLayerMouseEvent<'mouseenter'>) => {
+      if (!e.features?.[0]) return;
       map.current!.getCanvas().style.cursor = 'pointer';
       
-      const coordinates = e.features[0].geometry.coordinates.slice();
-      const { safety_score, pincode, risk_level, count } = e.features[0].properties;
+      const feature = e.features[0];
+      const point = feature.geometry as GeoJSON.Point;
+      const coordinates = new tt.LngLat(point.coordinates[0], point.coordinates[1]);
+      const { safety_score, pincode, risk_level, count } = feature.properties || {};
       
       popup.setLngLat(coordinates)
         .setHTML(`
@@ -314,12 +317,11 @@ export default function OptimizedMap({
   const addTouristMarkers = useCallback((touristData: Tourist[]) => {
     if (!map.current) return;
 
-    if (map.current.getSource('tourists')) {
-    if (map.current.getLayer('tourists-pulse')) map.current.removeLayer('tourists-pulse');
-    if (map.current.getLayer('tourists-layer')) map.current.removeLayer('tourists-layer');
+    // Remove existing tourist layers and source if they exist
     if (map.current.getLayer('tourist-labels')) map.current.removeLayer('tourist-labels');
-    map.current.removeSource('tourists');
-  }
+    if (map.current.getLayer('tourists-layer')) map.current.removeLayer('tourists-layer');
+    if (map.current.getLayer('tourists-pulse')) map.current.removeLayer('tourists-pulse');
+    if (map.current.getSource('tourists')) map.current.removeSource('tourists');
 
     // Add tourist source
     map.current.addSource('tourists', {
@@ -406,9 +408,12 @@ export default function OptimizedMap({
     });
 
     // Tourist click handler
-    map.current.on('click', 'tourists-layer', (e: any) => {
-      const tourist = e.features[0].properties as Tourist;
-      const coordinates = e.features[0].geometry.coordinates.slice();
+    map.current.on('click', 'tourists-layer', (e: tt.MapLayerMouseEvent<'click'>) => {
+      if (!e.features?.[0]) return;
+      const feature = e.features[0];
+      const tourist = feature.properties as Tourist;
+      const point = feature.geometry as GeoJSON.Point;
+      const coordinates = new tt.LngLat(point.coordinates[0], point.coordinates[1]);
       
       if (onTouristSelect) {
         onTouristSelect(tourist);
@@ -501,7 +506,7 @@ export default function OptimizedMap({
 
       // Update map source if it exists
       if (map.current?.getSource('tourists')) {
-        const source = map.current.getSource('tourists') as any;
+        const source = map.current.getSource('tourists') as tt.GeoJSONSource;
         source.setData({
           type: 'FeatureCollection',
           features: updatedTourists.map(tourist => ({
@@ -586,7 +591,7 @@ export default function OptimizedMap({
       }
       map.current?.remove();
     };
-  }, [center]);
+  }, [center, addOptimizedHeatmapLayer, addTouristMarkers, animateTourists, loadSafetyData]);
 
   // Layer visibility controller
   const toggleLayer = useCallback(() => {

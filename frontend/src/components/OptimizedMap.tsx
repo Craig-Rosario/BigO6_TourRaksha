@@ -132,6 +132,12 @@ export default function OptimizedMap({
   const addOptimizedHeatmapLayer = useCallback((data: SafetyData[]) => {
     if (!map.current || data.length === 0) return;
 
+    if (map.current.getSource('safety-data')) {
+    if (map.current.getLayer('safety-heatmap')) map.current.removeLayer('safety-heatmap');
+    if (map.current.getLayer('safety-points')) map.current.removeLayer('safety-points');
+    map.current.removeSource('safety-data');
+  }
+
     const maxScore = Math.max(...data.map(d => d.safety_score));
     const minScore = Math.min(...data.map(d => d.safety_score));
 
@@ -272,7 +278,7 @@ export default function OptimizedMap({
       closeOnClick: false
     });
 
-    map.current.on('mouseenter', 'safety-points', (e: tt.MapMouseEvent) => {
+    map.current.on('mouseenter', 'safety-points', (e: any) => {
       map.current!.getCanvas().style.cursor = 'pointer';
       
       const coordinates = e.features[0].geometry.coordinates.slice();
@@ -307,6 +313,13 @@ export default function OptimizedMap({
   // Enhanced tourist markers with real-time updates
   const addTouristMarkers = useCallback((touristData: Tourist[]) => {
     if (!map.current) return;
+
+    if (map.current.getSource('tourists')) {
+    if (map.current.getLayer('tourists-pulse')) map.current.removeLayer('tourists-pulse');
+    if (map.current.getLayer('tourists-layer')) map.current.removeLayer('tourists-layer');
+    if (map.current.getLayer('tourist-labels')) map.current.removeLayer('tourist-labels');
+    map.current.removeSource('tourists');
+  }
 
     // Add tourist source
     map.current.addSource('tourists', {
@@ -605,7 +618,7 @@ export default function OptimizedMap({
 
   const resetView = useCallback(() => {
     if (!map.current) return;
-    map.current.flyTo({ center: center, zoom: 12 });
+    map.current.flyTo({  });
   }, [center]);
 
   return (

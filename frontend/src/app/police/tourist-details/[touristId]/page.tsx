@@ -4,7 +4,7 @@ import {
     Table, TableHeader, TableRow, TableHead, TableBody, TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, MessageCircle, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
 export default function Page({

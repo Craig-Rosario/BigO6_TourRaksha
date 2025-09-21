@@ -1,10 +1,21 @@
-"use client";
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import PrintButton from "@/components/PrintButton";
 import TourRakshaLogo from "../../../../../../public/images/TourRakshaLogo.png";
+
+// Generate static params for the dynamic route
+export function generateStaticParams() {
+  // Return an array of possible touristId values for static generation
+  // For now, we'll include some sample values. You can customize this based on your needs.
+  return [
+    { touristId: 'SOS-001' },
+    { touristId: 'SOS-002' },
+    { touristId: 'SOS-003' },
+    // Add more tourist IDs as needed
+  ];
+}
 
 
 type FIR = {
@@ -61,7 +72,7 @@ export default function FIRLayoutPage() {
         
         <Button variant="outline">Back</Button>
         </Link>
-        <Button onClick={() => window.print()} variant="outline">Print</Button>
+        <PrintButton />
       </div>
 
       <Card className="bg-white border shadow-sm rounded-xl print:shadow-none print:border-0">
@@ -105,34 +116,35 @@ export default function FIRLayoutPage() {
         </CardContent>
       </Card>
 
-      <style jsx global>{`
-        @media print {
-          .no-print { display: none !important; }
-          @page { 
-            size: A4; 
-            margin: 12mm; 
+      {/* Print styles using dangerouslySetInnerHTML for server-side compatibility */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @media print {
+            .no-print { display: none !important; }
+            @page { 
+              size: A4; 
+              margin: 12mm; 
+            }
+            html, body { 
+              background: white;
+              height: 100%;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+            main, .main-content {
+              padding: 0 !important;
+              margin: 0 !important;
+            }
+            img {
+              print-color-adjust: exact;
+              -webkit-print-color-adjust: exact;
+            }
+            nav, header, footer {
+              display: none !important;
+            }
           }
-          html, body { 
-            background: white;
-            height: 100%;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          main, .main-content {
-            padding: 0 !important;
-            margin: 0 !important;
-          }
-          /* Ensure the logo prints */
-          img {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-          }
-          /* Remove any navigation or extra elements */
-          nav, header, footer {
-            display: none !important;
-          }
-        }
-      `}</style>
+        `
+      }} />
     </div>
   );
 }

@@ -7,6 +7,17 @@ import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
+// Generate static params for the dynamic route
+export function generateStaticParams() {
+  // Return an array of possible touristId values for static generation
+  return [
+    { touristId: 'SOS-001' },
+    { touristId: 'SOS-002' },
+    { touristId: 'SOS-003' },
+    // Add more tourist IDs as needed
+  ];
+}
+
 export default function Page({
     params,
 }: {

@@ -16,7 +16,7 @@ class TourRakshaLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: size,
-      height: size * 1.1,
+      height: size * 1.15,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -56,25 +56,17 @@ class TourRakshaLogo extends StatelessWidget {
             ),
           ),
           
-          // World map silhouette background
-          Positioned(
-            top: size * 0.15,
-            child: Icon(
-              Icons.public,
-              size: size * 0.2,
-              color: Colors.white.withOpacity(0.2),
-            ),
-          ),
-          
           // Main content
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Shield icon
-              Icon(
-                Icons.shield_outlined,
-                size: size * 0.28,
+              // Logo image
+              Image.asset(
+                'assets/TourRakshaLogo.png',
+                width: size * 0.7,
+                height: size * 0.7,
                 color: Colors.white,
+                colorBlendMode: BlendMode.srcIn,
               ),
               
               if (showText) ...[

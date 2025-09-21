@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
 import '../widgets/custom_button.dart';
+import '../widgets/tour_raksha_logo.dart';
 import '../utils/validation_utils.dart';
 import 'registration_screen.dart';
 import 'home_screen.dart';
@@ -196,6 +197,16 @@ class _AuthScreenState extends State<AuthScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 20),
+            
+            // Logo
+            const Center(
+              child: TourRakshaLogo(
+                size: 100,
+                showText: false,
+              ),
+            ),
+            
+            const SizedBox(height: 32),
             
             // Title
             Text(

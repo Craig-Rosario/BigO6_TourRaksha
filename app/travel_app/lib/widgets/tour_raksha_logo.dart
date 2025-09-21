@@ -16,14 +16,15 @@ class TourRakshaLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: size,
-      height: size * 1.1,
+      height: size * 1.15,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
             backgroundColor ?? const Color(0xFF1E40AF), // Professional blue
-            backgroundColor?.withOpacity(0.8) ?? const Color(0xFF1E3A8A), // Darker blue
+            backgroundColor?.withOpacity(0.8) ??
+                const Color(0xFF1E3A8A), // Darker blue
           ],
         ),
         borderRadius: BorderRadius.circular(size * 0.11),
@@ -35,10 +36,7 @@ class TourRakshaLogo extends StatelessWidget {
             spreadRadius: 2,
           ),
         ],
-        border: Border.all(
-          color: Colors.white,
-          width: size * 0.017,
-        ),
+        border: Border.all(color: Colors.white, width: size * 0.017),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -55,31 +53,23 @@ class TourRakshaLogo extends StatelessWidget {
               ),
             ),
           ),
-          
-          // World map silhouette background
-          Positioned(
-            top: size * 0.15,
-            child: Icon(
-              Icons.public,
-              size: size * 0.2,
-              color: Colors.white.withOpacity(0.2),
-            ),
-          ),
-          
+
           // Main content
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Shield icon
-              Icon(
-                Icons.shield_outlined,
-                size: size * 0.28,
+              // Logo image
+              Image.asset(
+                'assets/TourRakshaLogo.png',
+                width: size * 0.7,
+                height: size * 0.7,
                 color: Colors.white,
+                colorBlendMode: BlendMode.srcIn,
               ),
-              
+
               if (showText) ...[
                 SizedBox(height: size * 0.04),
-                
+
                 // App name
                 Text(
                   'TourRaksha',
@@ -90,9 +80,9 @@ class TourRakshaLogo extends StatelessWidget {
                     letterSpacing: 1.2,
                   ),
                 ),
-                
+
                 SizedBox(height: size * 0.02),
-                
+
                 // Hindi subtitle
                 Text(
                   'रक्षा',
@@ -105,7 +95,7 @@ class TourRakshaLogo extends StatelessWidget {
               ],
             ],
           ),
-          
+
           // Decorative corner elements
           Positioned(
             top: size * 0.08,
@@ -119,7 +109,7 @@ class TourRakshaLogo extends StatelessWidget {
               ),
             ),
           ),
-          
+
           Positioned(
             bottom: size * 0.08,
             left: size * 0.08,

@@ -34,10 +34,8 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // App Logo/Icon
-            const TourRakshaLogo(
-              size: 120,
-              showText: false,
-            ).animate()
+            const TourRakshaLogo(size: 120, showText: false)
+                .animate()
                 .scale(duration: 800.ms, curve: Curves.elasticOut)
                 .then()
                 .shimmer(

@@ -77,7 +77,9 @@ class _AuthScreenState extends State<AuthScreen>
           _isLoading = false;
           if (result?['success'] == true) {
             _otpSent = true;
-            _successMessage = result?['message'] ?? 'OTP sent successfully! Please check your email.';
+            _successMessage =
+                result?['message'] ??
+                'OTP sent successfully! Please check your email.';
           } else {
             _errorMessage = result?['message'] ?? 'Failed to send OTP';
           }
@@ -112,13 +114,14 @@ class _AuthScreenState extends State<AuthScreen>
 
         if (result?['success'] == true) {
           final data = result?['data'];
-          
-          if (_currentType == 'register' && data?['requiresRegistration'] == true) {
+
+          if (_currentType == 'register' &&
+              data?['requiresRegistration'] == true) {
             // Debug: Print user data
             print('OTP Verification result: $result');
             print('User data: $data');
             print('User ID: ${data['userId']}');
-            
+
             // Redirect to registration screen
             if (mounted) {
               Navigator.pushReplacement(
@@ -136,15 +139,14 @@ class _AuthScreenState extends State<AuthScreen>
             if (mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
               );
             }
           }
         } else {
           setState(() {
-            _errorMessage = result?['message'] ?? 'Invalid OTP. Please try again.';
+            _errorMessage =
+                result?['message'] ?? 'Invalid OTP. Please try again.';
           });
         }
       } catch (e) {
@@ -159,7 +161,7 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -197,17 +199,12 @@ class _AuthScreenState extends State<AuthScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 20),
-            
+
             // Logo
-            const Center(
-              child: TourRakshaLogo(
-                size: 100,
-                showText: false,
-              ),
-            ),
-            
+            const Center(child: TourRakshaLogo(size: 100, showText: false)),
+
             const SizedBox(height: 32),
-            
+
             // Title
             Text(
               title,
@@ -217,19 +214,19 @@ class _AuthScreenState extends State<AuthScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             Text(
               _currentType == 'register'
                   ? 'Enter your email to get started with TourRaksha'
                   : 'Enter your email to access your account',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
-            
+
             const SizedBox(height: 40),
 
             // Email Input
@@ -276,9 +273,7 @@ class _AuthScreenState extends State<AuthScreen>
                   fillColor: Colors.white,
                   counterText: '',
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'OTP is required';
@@ -303,7 +298,11 @@ class _AuthScreenState extends State<AuthScreen>
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green[600], size: 20),
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.green[600],
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -344,16 +343,16 @@ class _AuthScreenState extends State<AuthScreen>
 
             // Action Button
             CustomButton(
-              text: _isLoading 
-                  ? 'Processing...' 
-                  : _otpSent 
-                      ? 'Verify OTP' 
-                      : 'Send OTP',
-              onPressed: _isLoading 
-                  ? null 
-                  : _otpSent 
-                      ? _verifyOtp 
-                      : _sendOtp,
+              text: _isLoading
+                  ? 'Processing...'
+                  : _otpSent
+                  ? 'Verify OTP'
+                  : 'Send OTP',
+              onPressed: _isLoading
+                  ? null
+                  : _otpSent
+                  ? _verifyOtp
+                  : _sendOtp,
               isLoading: _isLoading,
             ),
 
@@ -361,14 +360,16 @@ class _AuthScreenState extends State<AuthScreen>
             if (_otpSent) ...[
               const SizedBox(height: 16),
               TextButton(
-                onPressed: _isLoading ? null : () {
-                  setState(() {
-                    _otpSent = false;
-                    _otpController.clear();
-                    _errorMessage = null;
-                    _successMessage = null;
-                  });
-                },
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        setState(() {
+                          _otpSent = false;
+                          _otpController.clear();
+                          _errorMessage = null;
+                          _successMessage = null;
+                        });
+                      },
                 child: const Text('Didn\'t receive OTP? Send again'),
               ),
             ],
@@ -397,10 +398,7 @@ class _AuthScreenState extends State<AuthScreen>
                   const SizedBox(height: 4),
                   Text(
                     'We use email-based OTP verification to ensure your account security.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue[700],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.blue[700]),
                     textAlign: TextAlign.center,
                   ),
                 ],

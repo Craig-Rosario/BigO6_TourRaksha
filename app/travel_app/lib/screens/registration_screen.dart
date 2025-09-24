@@ -202,6 +202,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       if (widget.userId != null) {
         // Debug: Print userId
         print('Registration: userId = ${widget.userId}');
+        print('Registration: userId type = ${widget.userId.runtimeType}');
+        print('Registration: userId is empty = ${widget.userId!.isEmpty}');
+        
+        if (widget.userId!.isEmpty) {
+          setState(() {
+            _isLoading = false;
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Registration failed: Invalid user ID received. Please try the registration process again.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
         
         // Complete registration after OTP verification
         final profile = await _authService.completeRegistration(

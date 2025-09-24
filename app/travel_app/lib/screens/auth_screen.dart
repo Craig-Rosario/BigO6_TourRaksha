@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import '../services/auth_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/tour_raksha_logo.dart';
-import '../utils/validation_utils.dart';
-import 'registration_screen.dart';
-import 'home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  final String? initialType; // 'login' or 'register'
+  
+  const AuthScreen({
+    super.key, 
+    this.initialType,
+  });
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -31,13 +34,29 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    
+    // Set initial type based on parameter
+    _currentType = widget.initialType ?? 'register';
+    print('AuthScreen: initialType = ${widget.initialType}, _currentType = $_currentType');
+    
+    _tabController = TabController(
+      length: 2, 
+      vsync: this,
+      initialIndex: _currentType == 'login' ? 1 : 0,
+    );
+    
+    print('AuthScreen: TabController initialIndex = ${_tabController.index}');
+    
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        setState(() {
-          _currentType = _tabController.index == 0 ? 'register' : 'login';
-          _resetForm();
-        });
+      if (!_tabController.indexIsChanging) {
+        final newType = _tabController.index == 0 ? 'register' : 'login';
+        if (newType != _currentType) {
+          setState(() {
+            _currentType = newType;
+            _resetForm();
+          });
+          print('AuthScreen: Tab changed to $_currentType');
+        }
       }
     });
   }
@@ -120,27 +139,33 @@ class _AuthScreenState extends State<AuthScreen>
             // Debug: Print user data
             print('OTP Verification result: $result');
             print('User data: $data');
-            print('User ID: ${data['userId']}');
+            print('User ID: ${data?['userId']}');
+            
+            // Add more specific debugging
+            if (data == null) {
+              print('ERROR: data is null from OTP verification');
+              setState(() {
+                _errorMessage = 'Registration failed: No user data received. Please try again.';
+              });
+              return;
+            }
+            
+            if (data['userId'] == null) {
+              print('ERROR: userId is null in data: $data');
+              setState(() {
+                _errorMessage = 'Registration failed: User ID not received. Please try again.';
+              });
+              return;
+            }
 
             // Redirect to registration screen
             if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RegistrationScreen(
-                    userId: data['userId'],
-                    email: data['email'],
-                  ),
-                ),
-              );
+              context.pushReplacement('/registration?userId=${data['userId']}&email=${Uri.encodeComponent(data['email'])}');
             }
           } else if (_currentType == 'login' && data?['user'] != null) {
             // Redirect to home screen
             if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-              );
+              context.pushReplacement('/home');
             }
           }
         } else {
@@ -246,9 +271,6 @@ class _AuthScreenState extends State<AuthScreen>
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Email is required';
-                }
-                if (!ValidationUtils.isValidEmail(value)) {
-                  return 'Please enter a valid email address';
                 }
                 return null;
               },

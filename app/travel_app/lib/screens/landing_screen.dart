@@ -155,10 +155,10 @@ class LandingScreen extends StatelessWidget {
 
                 const SizedBox(height: 40),
 
-                // Action Buttons - Professional Style
+                // Action Buttons - Clear Login and Register
                 Column(
                   children: [
-                    // Primary Email OTP Login Button
+                    // Login Button
                     Container(
                       width: double.infinity,
                       height: 60,
@@ -179,7 +179,7 @@ class LandingScreen extends StatelessWidget {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () => context.go('/otp-login'),
+                        onPressed: () => context.go('/auth?type=login'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
@@ -191,13 +191,13 @@ class LandingScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.email_outlined,
+                              Icons.login,
                               color: Colors.white,
                               size: 20,
                             ),
                             SizedBox(width: 8),
                             Text(
-                              'Login with Email OTP',
+                              'Login to Your Account',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -214,29 +214,40 @@ class LandingScreen extends StatelessWidget {
 
                     const SizedBox(height: 16),
                     
-                    // Alternative Login Button  
+                    // Register Button  
                     Container(
                       width: double.infinity,
                       height: 56,
                       child: OutlinedButton(
-                        onPressed: () => context.go('/auth'),
+                        onPressed: () => context.go('/auth?type=register'),
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: const Color(0xFF3B82F6),
+                            color: const Color(0xFF10B981),
                             width: 2,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text(
-                          'Other Login Options',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF3B82F6),
-                            letterSpacing: 0.5,
-                          ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.person_add,
+                              color: Color(0xFF10B981),
+                              size: 20,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Create New Account',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF10B981),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ).animate()

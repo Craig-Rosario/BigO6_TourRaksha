@@ -4,6 +4,7 @@ import 'package:travel_app/core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'providers/location_provider.dart';
 import 'providers/tourist_provider.dart';
+import 'services/route_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,7 @@ class TravelApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => TouristProvider()),
+        ChangeNotifierProvider(create: (_) => RouteService()),
       ],
       child: MaterialApp.router(
         title: 'TourRaksha - Tourist Safety App',

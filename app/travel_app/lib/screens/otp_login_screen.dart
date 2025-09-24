@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../services/auth_service.dart';
 import '../widgets/custom_button.dart';
-import '../utils/validation_utils.dart';
 
 class OtpLoginScreen extends StatefulWidget {
   const OtpLoginScreen({super.key});
@@ -190,7 +189,12 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
                   border: OutlineInputBorder(),
                 ),
                 enabled: !_otpSent,
-                validator: ValidationUtils.validateEmail,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Email is required';
+                  }
+                  return null;
+                },
               ),
               
               const SizedBox(height: 20),

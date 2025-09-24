@@ -366,21 +366,42 @@ export const verifyEmailOTP = async (req, res) => {
     }
 
     if (type === 'register') {
-      // Create a minimal user with just the email for registration
-      const user = await prisma.user.create({
-        data: { email }
+      // Check if user already exists
+      let user = await prisma.user.findUnique({
+        where: { email }
       });
 
-      res.status(201).json({
-        success: true,
-        message: "Email verified successfully",
-        data: { 
-          userId: user.id, 
-          email: user.email,
-          type: 'register',
-          requiresRegistration: true
-        }
-      });
+      if (user) {
+        // User already exists, check if profile is complete
+        const isProfileComplete = user.name && user.phoneNumber && user.nationality;
+        
+        res.json({
+          success: true,
+          message: "Email verified successfully",
+          data: { 
+            userId: user.id, 
+            email: user.email,
+            type: 'register',
+            requiresRegistration: !isProfileComplete
+          }
+        });
+      } else {
+        // Create a minimal user with just the email for registration
+        user = await prisma.user.create({
+          data: { email }
+        });
+
+        res.status(201).json({
+          success: true,
+          message: "Email verified successfully",
+          data: { 
+            userId: user.id, 
+            email: user.email,
+            type: 'register',
+            requiresRegistration: true
+          }
+        });
+      }
     } else if (type === 'login') {
       // Check if user exists
       let user = await prisma.user.findUnique({
@@ -445,14 +466,6 @@ export const verifyEmailOTP = async (req, res) => {
     }
   } catch (error) {
     console.error("Error verifying email OTP:", error);
-
-    // Handle unique constraint violation
-    if (error.code === "P2002") {
-      return res.status(400).json({
-        success: false,
-        message: "User with this email already exists"
-      });
-    }
 
     res.status(500).json({
       success: false,

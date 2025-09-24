@@ -8,6 +8,7 @@ import '../widgets/safety_score_card.dart';
 import '../widgets/quick_actions_grid.dart';
 import '../widgets/location_status_card.dart';
 import '../widgets/digital_id_card.dart';
+import '../widgets/route_deviation_banner.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,6 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Header
                     _buildHeader(touristProvider),
                     const SizedBox(height: 24),
+
+                    // Route Deviation Banner
+                    const RouteDeviationBanner(),
 
                     // Digital ID Card
                     const DigitalIdCard()

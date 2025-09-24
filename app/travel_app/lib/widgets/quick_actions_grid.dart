@@ -7,6 +7,7 @@ import '../providers/tourist_provider.dart';
 import '../providers/location_provider.dart';
 import '../screens/family_members_screen.dart';
 import '../screens/feedback_list_screen.dart';
+import '../screens/trip_itinerary_screen.dart';
 import '../widgets/sos_timer_dialog.dart';
 
 class QuickActionsGrid extends StatelessWidget {
@@ -27,11 +28,10 @@ class QuickActionsGrid extends StatelessWidget {
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio:
-              1.05, // Further reduced from 1.1 to 1.05 to give more height
+          crossAxisCount: 3,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.95,
           children: [
             _SOSButton(),
             _QuickActionCard(
@@ -40,6 +40,18 @@ class QuickActionsGrid extends StatelessWidget {
               icon: Icons.map_outlined,
               color: Colors.blue,
               onTap: () => context.go('/map'),
+            ),
+            _QuickActionCard(
+              title: 'Plan Route',
+              subtitle: 'Create trip itinerary',
+              icon: Icons.route_outlined,
+              color: Colors.indigo,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TripItineraryScreen(),
+                ),
+              ),
             ),
             _QuickActionCard(
               title: 'Family Members',
@@ -64,6 +76,13 @@ class QuickActionsGrid extends StatelessWidget {
                   builder: (context) => const FeedbackListScreen(),
                 ),
               ),
+            ),
+            _QuickActionCard(
+              title: 'Settings',
+              subtitle: 'App preferences',
+              icon: Icons.settings_outlined,
+              color: Colors.grey,
+              onTap: () => context.go('/settings'),
             ),
           ],
         ),

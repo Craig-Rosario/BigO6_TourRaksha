@@ -10,7 +10,7 @@ export default function Home() {
 
     <div className="p-0 m-0">
       <NavbarDemo />
-      <main className="p-0 m-0">
+      <main className="p-0 m-0 overflow-x-hidden">
         <Hero />
         {/* <Tablet/> */}
         <Features/>

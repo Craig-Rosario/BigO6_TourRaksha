@@ -42,7 +42,11 @@ class AppRouter {
       GoRoute(
         path: '/auth',
         name: 'auth',
-        builder: (context, state) => const AuthScreen(),
+        builder: (context, state) {
+          final type =
+              state.uri.queryParameters['type']; // 'login' or 'register'
+          return AuthScreen(initialType: type);
+        },
       ),
 
       // OTP Login
@@ -59,10 +63,7 @@ class AppRouter {
         builder: (context, state) {
           final userId = state.uri.queryParameters['userId'];
           final email = state.uri.queryParameters['email'];
-          return RegistrationScreen(
-            userId: userId,
-            email: email,
-          );
+          return RegistrationScreen(userId: userId, email: email);
         },
       ),
 

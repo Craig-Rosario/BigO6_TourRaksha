@@ -7,9 +7,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/location_provider.dart';
 import '../providers/tourist_provider.dart';
 import '../services/location_coordinates_service.dart';
+import '../services/route_service.dart';
 import '../utils/theme.dart';
 import '../widgets/sos_timer_dialog.dart';
 import '../widgets/location_feedback_dialog.dart';
+import '../widgets/route_deviation_dialog.dart';
 import '../screens/family_members_screen.dart';
 
 class MapScreen extends StatefulWidget {
@@ -63,6 +65,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeLocation();
+      _setupRouteDeviationListener();
     });
   }
 
@@ -98,6 +101,36 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         _initialZoom,
       );
     }
+  }
+
+  void _setupRouteDeviationListener() {
+    final routeService = Provider.of<RouteService>(context, listen: false);
+
+    // Listen for route deviations
+    routeService.addListener(() {
+      if (!mounted) return;
+
+      final unacknowledgedDeviations = routeService
+          .getUnacknowledgedDeviations();
+
+      for (final deviation in unacknowledgedDeviations) {
+        if (deviation.type.index >= 1 &&
+            !RouteDeviationAlertService.isAlertShowing) {
+          // moderate and above
+          RouteDeviationAlertService.showDeviationAlert(
+            context: context,
+            deviation: deviation,
+            onDismiss: () {
+              // Just dismiss the alert
+            },
+            onAcknowledge: () {
+              routeService.acknowledgeDeviation(deviation.id);
+            },
+          );
+          break; // Show only one alert at a time
+        }
+      }
+    });
   }
 
   void _toggleTracking() {

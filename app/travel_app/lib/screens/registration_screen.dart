@@ -7,14 +7,10 @@ import '../widgets/custom_button.dart';
 import '../services/auth_service.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  final String? userId;  // Provided after OTP verification
-  final String? email;   // Pre-filled email from OTP verification
+  final String? userId; // Provided after OTP verification
+  final String? email; // Pre-filled email from OTP verification
 
-  const RegistrationScreen({
-    super.key, 
-    this.userId,
-    this.email,
-  });
+  const RegistrationScreen({super.key, this.userId, this.email});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -33,7 +29,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
   final _languagesController = TextEditingController();
-  
+
   String? _gender;
   String? _bloodGroup;
   String? _emergencyContactRelationship;
@@ -45,10 +41,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   final List<String> _plannedLocations = [];
   final _locationController = TextEditingController();
-  
+
   final _authService = AuthService();
   bool _isLoading = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -128,32 +124,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       _showSnackBar('Please enter your full name');
       return;
     }
-    
+
     if (_phoneController.text.trim().isEmpty) {
       _showSnackBar('Please enter your phone number');
       return;
     }
-    
+
     if (_passportController.text.trim().isEmpty) {
       _showSnackBar('Please enter your passport number');
       return;
     }
-    
+
     if (_nationalityController.text.trim().isEmpty) {
       _showSnackBar('Please enter your nationality');
       return;
     }
-    
+
     if (_emergencyContactController.text.trim().isEmpty) {
       _showSnackBar('Please enter emergency contact name');
       return;
     }
-    
+
     if (_emergencyPhoneController.text.trim().isEmpty) {
       _showSnackBar('Please enter emergency contact phone');
       return;
     }
-    
+
     if (_emergencyContactRelationship == null) {
       _showSnackBar('Please select emergency contact relationship');
       return;
@@ -167,12 +163,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       'passportNumber': _passportController.text.trim(),
       'nationality': _nationalityController.text.trim(),
       'dateOfBirth': _dateOfBirth?.toIso8601String(),
-      'height': _heightController.text.trim().isNotEmpty ? double.tryParse(_heightController.text.trim()) : null,
-      'weight': _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
+      'height': _heightController.text.trim().isNotEmpty
+          ? double.tryParse(_heightController.text.trim())
+          : null,
+      'weight': _weightController.text.trim().isNotEmpty
+          ? double.tryParse(_weightController.text.trim())
+          : null,
     };
 
     final validation = await _authService.validateUserData(userData);
-    if (validation != null && validation['success'] == true && validation['isValid'] == false) {
+    if (validation != null &&
+        validation['success'] == true &&
+        validation['isValid'] == false) {
       final errors = validation['errors'] as List;
       if (errors.isNotEmpty) {
         _showSnackBar('Validation error: ${errors.first['message']}');
@@ -183,10 +185,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     // Validate additional fields
     await _validateForm();
-    
+
     if (_plannedLocations.isEmpty && widget.userId == null) {
       _showSnackBar('Please add at least one planned location');
       return;
@@ -198,11 +200,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     try {
       bool success = false;
-      
+
       if (widget.userId != null) {
         // Debug: Print userId
         print('Registration: userId = ${widget.userId}');
-        
+        print('Registration: userId type = ${widget.userId.runtimeType}');
+        print('Registration: userId is empty = ${widget.userId!.isEmpty}');
+
+        if (widget.userId!.isEmpty) {
+          setState(() {
+            _isLoading = false;
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Registration failed: Invalid user ID received. Please try the registration process again.',
+                ),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
+
         // Complete registration after OTP verification
         final profile = await _authService.completeRegistration(
           userId: widget.userId!,
@@ -214,12 +235,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           emergencyContactNumber: _emergencyPhoneController.text.trim(),
           emergencyContactRelationship: _emergencyContactRelationship,
           dateOfBirth: _dateOfBirth,
-          address: _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
+          address: _addressController.text.trim().isNotEmpty
+              ? _addressController.text.trim()
+              : null,
           gender: _gender,
           bloodGroup: _bloodGroup,
-          height: _heightController.text.trim().isNotEmpty ? double.tryParse(_heightController.text.trim()) : null,
-          weight: _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
-          languages: _languagesController.text.trim().isNotEmpty ? _languagesController.text.trim() : null,
+          height: _heightController.text.trim().isNotEmpty
+              ? double.tryParse(_heightController.text.trim())
+              : null,
+          weight: _weightController.text.trim().isNotEmpty
+              ? double.tryParse(_weightController.text.trim())
+              : null,
+          languages: _languagesController.text.trim().isNotEmpty
+              ? _languagesController.text.trim()
+              : null,
           organDonor: _organDonor,
         );
 
@@ -232,9 +261,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               nationality: profile.nationality,
               emergencyContact: profile.emergencyContact,
               emergencyContactNumber: profile.emergencyContactNumber,
-              emergencyContactRelationship: profile.emergencyContactRelationship,
-              tripStartDate: DateTime.now(), // You might want to get this from form
-              tripEndDate: DateTime.now().add(const Duration(days: 30)), // You might want to get this from form
+              emergencyContactRelationship:
+                  profile.emergencyContactRelationship,
+              tripStartDate:
+                  DateTime.now(), // You might want to get this from form
+              tripEndDate: DateTime.now().add(
+                const Duration(days: 30),
+              ), // You might want to get this from form
               plannedLocations: [], // You might want to get this from form
             );
             success = true;
@@ -335,7 +368,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             children: [
               // Header
               Text(
-                widget.userId != null 
+                widget.userId != null
                     ? 'Complete Your Tourist Profile'
                     : 'Create Digital Tourist ID',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -352,10 +385,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   decoration: BoxDecoration(
                     color: Colors.blue.shade50,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.blue.shade200,
-                      width: 1,
-                    ),
+                    border: Border.all(color: Colors.blue.shade200, width: 1),
                   ),
                   child: Row(
                     children: [
@@ -450,7 +480,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onTap: () async {
                   final DateTime? picked = await showDatePicker(
                     context: context,
-                    initialDate: _dateOfBirth ?? DateTime.now().subtract(const Duration(days: 6570)), // Default to 18 years ago
+                    initialDate:
+                        _dateOfBirth ??
+                        DateTime.now().subtract(
+                          const Duration(days: 6570),
+                        ), // Default to 18 years ago
                     firstDate: DateTime(1900),
                     lastDate: DateTime.now(),
                   );
@@ -464,7 +498,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.5),
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -472,7 +508,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     children: [
                       Icon(
                         Icons.calendar_today_outlined,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -481,20 +519,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           children: [
                             Text(
                               'Date of Birth',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withOpacity(0.7),
+                                  ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               _dateOfBirth != null
                                   ? '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}'
                                   : 'Select date of birth',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: _dateOfBirth != null 
-                                    ? null 
-                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                              ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: _dateOfBirth != null
+                                        ? null
+                                        : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withOpacity(0.5),
+                                  ),
                             ),
                           ],
                         ),
@@ -517,7 +562,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.5),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -532,7 +579,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   DropdownMenuItem(value: 'Male', child: Text('Male')),
                   DropdownMenuItem(value: 'Female', child: Text('Female')),
                   DropdownMenuItem(value: 'Other', child: Text('Other')),
-                  DropdownMenuItem(value: 'Prefer not to say', child: Text('Prefer not to say')),
+                  DropdownMenuItem(
+                    value: 'Prefer not to say',
+                    child: Text('Prefer not to say'),
+                  ),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -554,7 +604,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.5),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -628,7 +680,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               // Organ Donor Checkbox
               CheckboxListTile(
                 title: const Text('I am willing to be an organ donor'),
-                subtitle: const Text('This information may be helpful in medical emergencies'),
+                subtitle: const Text(
+                  'This information may be helpful in medical emergencies',
+                ),
                 value: _organDonor,
                 onChanged: (value) {
                   setState(() {
@@ -683,7 +737,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.5),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -721,89 +777,89 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               // Trip Details (only for legacy flow, not OTP flow)
               if (widget.userId == null) ...[
                 _buildSectionHeader('Trip Details'),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Date Selection
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildDateSelector(
-                      'Trip Start',
-                      _tripStartDate,
-                      () => _selectDate(context, true),
+                // Date Selection
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildDateSelector(
+                        'Trip Start',
+                        _tripStartDate,
+                        () => _selectDate(context, true),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildDateSelector(
-                      'Trip End',
-                      _tripEndDate,
-                      () => _selectDate(context, false),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildDateSelector(
+                        'Trip End',
+                        _tripEndDate,
+                        () => _selectDate(context, false),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
+                  ],
+                ),
+                const SizedBox(height: 24),
 
-              // Planned Locations
-              Text(
-                'Planned Locations',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 12),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      controller: _locationController,
-                      label: 'Add location',
-                      icon: Icons.location_on_outlined,
-                      onSubmitted: (_) => _addLocation(),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  IconButton.filled(
-                    onPressed: _addLocation,
-                    icon: const Icon(Icons.add),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Location List
-              if (_plannedLocations.isNotEmpty) ...[
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withOpacity(0.5),
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: _plannedLocations.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      String location = entry.value;
-
-                      return ListTile(
-                        leading: const Icon(Icons.location_on, size: 20),
-                        title: Text(location),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
-                          onPressed: () => _removeLocation(index),
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        dense: true,
-                      );
-                    }).toList(),
+                // Planned Locations
+                Text(
+                  'Planned Locations',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 32),
-              ],
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        controller: _locationController,
+                        label: 'Add location',
+                        icon: Icons.location_on_outlined,
+                        onSubmitted: (_) => _addLocation(),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    IconButton.filled(
+                      onPressed: _addLocation,
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Location List
+                if (_plannedLocations.isNotEmpty) ...[
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withOpacity(0.5),
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: _plannedLocations.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        String location = entry.value;
+
+                        return ListTile(
+                          leading: const Icon(Icons.location_on, size: 20),
+                          title: Text(location),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.remove_circle_outline),
+                            onPressed: () => _removeLocation(index),
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          dense: true,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
               ],
 
               // Register Button

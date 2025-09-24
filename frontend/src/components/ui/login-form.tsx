@@ -32,10 +32,17 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       return;
     }
 
+    // Check if it's the test email
+    if (email.toLowerCase() !== 'admin@tourraksha.com') {
+      setError('Invalid email address. Please use the test email provided.');
+      setIsLoading(false);
+      return;
+    }
+
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Proceed to OTP step for any valid email
+    // Proceed to OTP step for the test email
     setStep('otp');
     setIsLoading(false);
   };
@@ -46,8 +53,8 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     setError('');
 
     // Verify that OTP is exactly 123456
-    if (otp !== '123456') {
-      setError('Invalid OTP. Please try again.');
+    if (otp !== '123952') {
+      setError('Invalid OTP. Please use the test OTP provided.');
       setIsLoading(false);
       return;
     }
@@ -127,6 +134,9 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
       {step === 'email' && (
         <form onSubmit={handleSendOTP} className="grid gap-6">
+          <div>
+            <p className="font-semibold text-center">(Test Email: admin@tourraksha.com)</p>
+          </div>
           <div className="grid gap-3">
             <Label htmlFor="email">Email Address</Label>
             <div className="relative">
@@ -163,6 +173,9 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
       {step === 'otp' && (
         <form onSubmit={handleVerifyOTP} className="grid gap-6">
+          <div>
+            <p className="font-semibold text-center">(Test OTP: 123952)</p>
+          </div>
           <div className="grid gap-3">
             <Label htmlFor="otp">Verification Code</Label>
             <Input
@@ -193,7 +206,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
             )}
           </Button>
 
-          <div className="text-center">
+          {/* <div className="text-center">
             <Button
               type="button"
               variant="ghost"
@@ -203,7 +216,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
             >
               Didn&apos;t receive code? Resend
             </Button>
-          </div>
+          </div> */}
 
           <div className="text-center">
             <Button

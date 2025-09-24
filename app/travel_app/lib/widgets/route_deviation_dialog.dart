@@ -17,19 +17,14 @@ class RouteDeviationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              _getDeviationColor().withOpacity(0.1),
-              Colors.white,
-            ],
+            colors: [_getDeviationColor().withOpacity(0.1), Colors.white],
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -51,7 +46,7 @@ class RouteDeviationDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             Text(
               'Route Deviation Detected',
               style: TextStyle(
@@ -62,13 +57,10 @@ class RouteDeviationDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            
+
             Text(
               _getDeviationMessage(),
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -88,7 +80,8 @@ class RouteDeviationDialog extends StatelessWidget {
                   _buildDetailRow(
                     icon: Icons.straighten,
                     label: 'Distance from route',
-                    value: '${deviation.deviationDistance.toStringAsFixed(0)} meters',
+                    value:
+                        '${deviation.deviationDistance.toStringAsFixed(0)} meters',
                   ),
                   const SizedBox(height: 8),
                   _buildDetailRow(
@@ -125,10 +118,7 @@ class RouteDeviationDialog extends StatelessWidget {
                   icon: const Icon(Icons.phone),
                   label: const Text(
                     'Call Emergency Services',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -180,7 +170,7 @@ class RouteDeviationDialog extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // Additional safety message
             const SizedBox(height: 16),
             Container(
@@ -197,10 +187,7 @@ class RouteDeviationDialog extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Your location is being monitored for safety. If you need help, tap "Call Emergency Services".',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue[700],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.blue[700]),
                     ),
                   ),
                 ],
@@ -224,10 +211,7 @@ class RouteDeviationDialog extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$label:',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
         const Spacer(),
         Text(
@@ -269,8 +253,8 @@ class RouteDeviationDialog extends StatelessWidget {
   }
 
   bool _shouldShowEmergencyButton() {
-    return deviation.type == DeviationType.major || 
-           deviation.type == DeviationType.critical;
+    return deviation.type == DeviationType.major ||
+        deviation.type == DeviationType.critical;
   }
 
   String _formatTime(DateTime time) {
@@ -280,7 +264,7 @@ class RouteDeviationDialog extends StatelessWidget {
   void _callEmergencyServices() async {
     const phoneNumber = 'tel:112'; // European emergency number
     final uri = Uri.parse(phoneNumber);
-    
+
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {

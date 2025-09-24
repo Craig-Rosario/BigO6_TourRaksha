@@ -21,7 +21,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
     WaypointFormData(order: 0, type: WaypointType.start),
     WaypointFormData(order: 1, type: WaypointType.destination),
   ];
-  
+
   bool _isGeneratingRoute = false;
 
   @override
@@ -95,17 +95,16 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
               child: Column(
                 children: [
                   CustomButton(
-                    text: _isGeneratingRoute ? 'Generating Route...' : 'Generate Route',
+                    text: _isGeneratingRoute
+                        ? 'Generating Route...'
+                        : 'Generate Route',
                     onPressed: _isGeneratingRoute ? null : _generateRoute,
                     isLoading: _isGeneratingRoute,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Make sure to add at least 2 destinations',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                 ],
               ),
@@ -281,16 +280,17 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
                     vertical: 8,
                   ),
                 ),
-                items: [
-                  WaypointType.destination,
-                  WaypointType.stopover,
-                  WaypointType.poi,
-                ].map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(_getWaypointTypeDisplayName(type)),
-                  );
-                }).toList(),
+                items:
+                    [
+                      WaypointType.destination,
+                      WaypointType.stopover,
+                      WaypointType.poi,
+                    ].map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(_getWaypointTypeDisplayName(type)),
+                      );
+                    }).toList(),
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
@@ -376,7 +376,10 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
       // Convert form data to waypoints
       final List<RouteWaypoint> routeWaypoints = _waypoints.map((formData) {
         return RouteWaypoint(
-          id: DateTime.now().millisecondsSinceEpoch.toString() + '_' + formData.order.toString(),
+          id:
+              DateTime.now().millisecondsSinceEpoch.toString() +
+              '_' +
+              formData.order.toString(),
           name: formData.nameController.text.trim(),
           description: formData.descriptionController.text.trim().isEmpty
               ? null
@@ -393,7 +396,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
       // Generate route using route service
       final routeService = context.read<RouteService>();
       final tripId = DateTime.now().millisecondsSinceEpoch.toString();
-      
+
       final route = await routeService.generateRoute(
         tripId: tripId,
         waypoints: routeWaypoints,
@@ -403,13 +406,13 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
         // Navigate to route display screen
         if (mounted) {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const RouteDisplayScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const RouteDisplayScreen()),
           );
         }
       } else {
-        _showErrorSnackBar('Failed to generate route. Please check your waypoints.');
+        _showErrorSnackBar(
+          'Failed to generate route. Please check your waypoints.',
+        );
       }
     } catch (e) {
       _showErrorSnackBar('Error generating route: ${e.toString()}');
@@ -424,10 +427,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
@@ -505,14 +505,11 @@ class WaypointFormData {
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  
+
   int order;
   WaypointType type;
 
-  WaypointFormData({
-    required this.order,
-    required this.type,
-  });
+  WaypointFormData({required this.order, required this.type});
 
   void dispose() {
     nameController.dispose();

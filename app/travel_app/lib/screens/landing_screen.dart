@@ -34,13 +34,9 @@ class LandingScreen extends StatelessWidget {
                 Column(
                   children: [
                     // Professional Logo
-                    const TourRakshaLogo(
-                      size: 150,
-                      showText: true,
-                    ).animate().scale(
-                      duration: 800.ms,
-                      curve: Curves.elasticOut,
-                    ),
+                    const TourRakshaLogo(size: 150, showText: true)
+                        .animate()
+                        .scale(duration: 800.ms, curve: Curves.elasticOut),
 
                     const SizedBox(height: 24),
 
@@ -63,25 +59,26 @@ class LandingScreen extends StatelessWidget {
 
                     // Subtitle with brand name
                     RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: const Color(0xFF475569),
-                          fontSize: 20,
-                          height: 1.3,
-                        ),
-                        children: [
-                          const TextSpan(text: 'with '),
-                          TextSpan(
-                            text: 'TourRaksha',
-                            style: TextStyle(
-                              color: const Color(0xFF1E40AF),
-                              fontWeight: FontWeight.bold,
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: const Color(0xFF475569),
+                              fontSize: 20,
+                              height: 1.3,
                             ),
+                            children: [
+                              const TextSpan(text: 'with '),
+                              TextSpan(
+                                text: 'TourRaksha',
+                                style: TextStyle(
+                                  color: const Color(0xFF1E40AF),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ).animate()
+                        )
+                        .animate()
                         .fadeIn(duration: 600.ms, delay: 400.ms)
                         .slideY(begin: 0.3, end: 0),
 
@@ -107,49 +104,50 @@ class LandingScreen extends StatelessWidget {
 
                 // Features List - Professional Cards
                 Container(
-                  padding: const EdgeInsets.all(24),
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 25,
-                        offset: const Offset(0, 10),
-                        spreadRadius: 2,
+                      padding: const EdgeInsets.all(24),
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 25,
+                            offset: const Offset(0, 10),
+                            spreadRadius: 2,
+                          ),
+                        ],
+                        border: Border.all(
+                          color: const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
                       ),
-                    ],
-                    border: Border.all(
-                      color: const Color(0xFFE2E8F0),
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildFeatureItem(
-                        Icons.security_outlined,
-                        'AI-Powered Safety',
-                        'Real-time threat detection and alerts',
-                        const Color(0xFF10B981),
+                      child: Column(
+                        children: [
+                          _buildFeatureItem(
+                            Icons.security_outlined,
+                            'AI-Powered Safety',
+                            'Real-time threat detection and alerts',
+                            const Color(0xFF10B981),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildFeatureItem(
+                            Icons.location_on_outlined,
+                            'Geo-Fencing',
+                            'Smart boundary monitoring for safety',
+                            const Color(0xFF3B82F6),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildFeatureItem(
+                            Icons.verified_user_outlined,
+                            'Blockchain IDs',
+                            'Secure digital identity verification',
+                            const Color(0xFF8B5CF6),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      _buildFeatureItem(
-                        Icons.location_on_outlined,
-                        'Geo-Fencing',
-                        'Smart boundary monitoring for safety',
-                        const Color(0xFF3B82F6),
-                      ),
-                      const SizedBox(height: 20),
-                      _buildFeatureItem(
-                        Icons.verified_user_outlined,
-                        'Blockchain IDs',
-                        'Secure digital identity verification',
-                        const Color(0xFF8B5CF6),
-                      ),
-                    ],
-                  ),
-                ).animate()
+                    )
+                    .animate()
                     .fadeIn(duration: 600.ms, delay: 800.ms)
                     .slideY(begin: 0.3, end: 0),
 
@@ -160,102 +158,104 @@ class LandingScreen extends StatelessWidget {
                   children: [
                     // Login Button
                     Container(
-                      width: double.infinity,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF1E40AF), // Professional blue
-                            Color(0xFF3B82F6), // Light blue
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF1E40AF).withOpacity(0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: () => context.go('/auth?type=login'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.login,
-                              color: Colors.white,
-                              size: 20,
+                          width: double.infinity,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFF1E40AF), // Professional blue
+                                Color(0xFF3B82F6), // Light blue
+                              ],
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Login to Your Account',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF1E40AF).withOpacity(0.3),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () => context.go('/auth?type=login'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ).animate()
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.login,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Login to Your Account',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        .animate()
                         .fadeIn(duration: 600.ms, delay: 800.ms)
                         .slideY(begin: 0.5, end: 0),
 
                     const SizedBox(height: 16),
-                    
-                    // Register Button  
+
+                    // Register Button
                     Container(
-                      width: double.infinity,
-                      height: 56,
-                      child: OutlinedButton(
-                        onPressed: () => context.go('/auth?type=register'),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: const Color(0xFF10B981),
-                            width: 2,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.person_add,
-                              color: Color(0xFF10B981),
-                              size: 20,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Create New Account',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF10B981),
-                                letterSpacing: 0.5,
+                          width: double.infinity,
+                          height: 56,
+                          child: OutlinedButton(
+                            onPressed: () => context.go('/auth?type=register'),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: const Color(0xFF10B981),
+                                width: 2,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ).animate()
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.person_add,
+                                  color: Color(0xFF10B981),
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Create New Account',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF10B981),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        .animate()
                         .fadeIn(duration: 600.ms, delay: 900.ms)
                         .slideY(begin: 0.5, end: 0),
 
                     const SizedBox(height: 12),
-                    
+
                     // Learn More Button
                     TextButton.icon(
                       onPressed: () => context.go('/onboarding'),
@@ -275,7 +275,7 @@ class LandingScreen extends StatelessWidget {
                     ).animate().fadeIn(duration: 600.ms, delay: 950.ms),
 
                     const SizedBox(height: 16),
-                    
+
                     // Continue as Guest link
                     TextButton(
                       onPressed: () => context.go('/home'),
@@ -301,7 +301,12 @@ class LandingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureItem(IconData icon, String title, String description, Color accentColor) {
+  Widget _buildFeatureItem(
+    IconData icon,
+    String title,
+    String description,
+    Color accentColor,
+  ) {
     return Row(
       children: [
         Container(
@@ -310,16 +315,9 @@ class LandingScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: accentColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: accentColor.withOpacity(0.2),
-              width: 1,
-            ),
+            border: Border.all(color: accentColor.withOpacity(0.2), width: 1),
           ),
-          child: Icon(
-            icon, 
-            color: accentColor, 
-            size: 28,
-          ),
+          child: Icon(icon, color: accentColor, size: 28),
         ),
         const SizedBox(width: 20),
         Expanded(

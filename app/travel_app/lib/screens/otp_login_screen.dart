@@ -35,14 +35,18 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
       });
 
       try {
-        final result = await _authService.sendEmailOTP(_emailController.text, 'login');
+        final result = await _authService.sendEmailOTP(
+          _emailController.text,
+          'login',
+        );
 
         setState(() {
           _isLoading = false;
           if (result?['success'] == true) {
             _otpSent = true;
           } else {
-            _errorMessage = result?['message'] ?? 'Failed to send OTP. Please try again.';
+            _errorMessage =
+                result?['message'] ?? 'Failed to send OTP. Please try again.';
           }
         });
       } catch (e) {
@@ -74,12 +78,14 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
 
         if (result?['success'] == true) {
           final data = result?['data'];
-          
+
           // Check if user needs to complete registration
           if (data?['requiresRegistration'] == true) {
             // Redirect to registration screen with userId
             if (mounted) {
-              context.go('/registration?userId=${data['userId']}&email=${data['email']}');
+              context.go(
+                '/registration?userId=${data['userId']}&email=${data['email']}',
+              );
             }
           } else if (data?['user'] != null) {
             // User already registered, redirect to home
@@ -89,7 +95,8 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
           }
         } else {
           setState(() {
-            _errorMessage = result?['message'] ?? 'Invalid OTP. Please try again.';
+            _errorMessage =
+                result?['message'] ?? 'Invalid OTP. Please try again.';
           });
         }
       } catch (e) {
@@ -128,16 +135,16 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              
+
               // App logo or icon
               Icon(
                 Icons.travel_explore,
                 size: 100,
                 color: Theme.of(context).primaryColor,
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Title
               Text(
                 !_otpSent ? 'Login with Email OTP' : 'Enter Verification Code',
@@ -146,22 +153,22 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              
+
               const SizedBox(height: 8),
 
               // Subtitle
               Text(
-                !_otpSent 
+                !_otpSent
                     ? 'We\'ll send a verification code to your email'
                     : 'Please enter the 6-digit code sent to\n${_emailController.text}',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
               ),
-              
+
               const SizedBox(height: 30),
-              
+
               // Error message
               if (_errorMessage != null)
                 Container(
@@ -177,7 +184,7 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              
+
               // Email field
               TextFormField(
                 controller: _emailController,
@@ -196,9 +203,9 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // OTP field (visible only after OTP is sent)
               if (_otpSent)
                 Column(
@@ -230,34 +237,34 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 10),
-                    
+
                     TextButton(
                       onPressed: _isLoading ? null : _sendOtp,
                       child: Text(
                         'Resend OTP',
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
                   ],
                 ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Action button (Send OTP or Verify OTP)
               CustomButton(
-                onPressed: _isLoading ? null : (_otpSent ? _verifyOtp : _sendOtp),
+                onPressed: _isLoading
+                    ? null
+                    : (_otpSent ? _verifyOtp : _sendOtp),
                 text: _isLoading
                     ? 'Please wait...'
                     : (_otpSent ? 'Verify OTP' : 'Send OTP'),
                 isLoading: _isLoading,
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Alternative login options
               if (!_otpSent)
                 Column(

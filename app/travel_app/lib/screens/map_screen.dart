@@ -105,15 +105,18 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   void _setupRouteDeviationListener() {
     final routeService = Provider.of<RouteService>(context, listen: false);
-    
+
     // Listen for route deviations
     routeService.addListener(() {
       if (!mounted) return;
-      
-      final unacknowledgedDeviations = routeService.getUnacknowledgedDeviations();
-      
+
+      final unacknowledgedDeviations = routeService
+          .getUnacknowledgedDeviations();
+
       for (final deviation in unacknowledgedDeviations) {
-        if (deviation.type.index >= 1 && !RouteDeviationAlertService.isAlertShowing) { // moderate and above
+        if (deviation.type.index >= 1 &&
+            !RouteDeviationAlertService.isAlertShowing) {
+          // moderate and above
           RouteDeviationAlertService.showDeviationAlert(
             context: context,
             deviation: deviation,

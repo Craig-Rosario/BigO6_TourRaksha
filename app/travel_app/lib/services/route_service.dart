@@ -10,7 +10,7 @@ class RouteService extends ChangeNotifier {
   bool _isTrackingRoute = false;
   Timer? _routeTrackingTimer;
   StreamSubscription<Position>? _positionStream;
-  
+
   // Deviation thresholds in meters
   static const double _minorDeviationThreshold = 100.0; // 100m
   static const double _moderateDeviationThreshold = 500.0; // 500m
@@ -29,7 +29,9 @@ class RouteService extends ChangeNotifier {
   }) async {
     try {
       if (waypoints.length < 2) {
-        throw Exception('At least 2 waypoints are required to generate a route');
+        throw Exception(
+          'At least 2 waypoints are required to generate a route',
+        );
       }
 
       // Sort waypoints by order
@@ -76,14 +78,17 @@ class RouteService extends ChangeNotifier {
     notifyListeners();
 
     // Start location tracking
-    _positionStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10, // Update every 10 meters
-      ),
-    ).listen((Position position) {
-      _checkForRouteDeviation(LatLng(position.latitude, position.longitude));
-    });
+    _positionStream =
+        Geolocator.getPositionStream(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 10, // Update every 10 meters
+          ),
+        ).listen((Position position) {
+          _checkForRouteDeviation(
+            LatLng(position.latitude, position.longitude),
+          );
+        });
 
     debugPrint('Route tracking started');
   }
@@ -102,10 +107,13 @@ class RouteService extends ChangeNotifier {
     if (_currentRoute == null) return;
 
     final expectedLocation = _getExpectedLocationOnRoute(currentLocation);
-    final deviationDistance = _calculateDistance(currentLocation, expectedLocation);
+    final deviationDistance = _calculateDistance(
+      currentLocation,
+      expectedLocation,
+    );
 
     DeviationType? deviationType;
-    
+
     if (deviationDistance > _criticalDeviationThreshold) {
       deviationType = DeviationType.critical;
     } else if (deviationDistance > _majorDeviationThreshold) {
@@ -160,24 +168,28 @@ class RouteService extends ChangeNotifier {
   /// Trigger deviation alert
   void _triggerDeviationAlert(RouteDeviation deviation) {
     // This will be handled by the UI to show popup
-    debugPrint('Route deviation detected: ${deviation.type.name} - ${deviation.deviationDistance.toStringAsFixed(0)}m');
-    
+    debugPrint(
+      'Route deviation detected: ${deviation.type.name} - ${deviation.deviationDistance.toStringAsFixed(0)}m',
+    );
+
     // Trigger notification for listeners
     notifyListeners();
   }
 
   /// Calculate route polyline (simplified version)
-  Future<List<LatLng>> _calculateRoutePolyline(List<List<double>> coordinates) async {
+  Future<List<LatLng>> _calculateRoutePolyline(
+    List<List<double>> coordinates,
+  ) async {
     // In a real implementation, you would call the routing API here
     // For demo, we'll create a simple straight-line route between points
     List<LatLng> polyline = [];
-    
+
     for (int i = 0; i < coordinates.length - 1; i++) {
       final start = LatLng(coordinates[i][1], coordinates[i][0]);
       final end = LatLng(coordinates[i + 1][1], coordinates[i + 1][0]);
-      
+
       polyline.add(start);
-      
+
       // Add intermediate points for a more realistic route
       const int intermediatePoints = 10;
       for (int j = 1; j < intermediatePoints; j++) {
@@ -187,7 +199,7 @@ class RouteService extends ChangeNotifier {
         polyline.add(LatLng(lat, lng));
       }
     }
-    
+
     polyline.add(LatLng(coordinates.last[1], coordinates.last[0]));
     return polyline;
   }

@@ -11,8 +11,9 @@ class RouteDeviationBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<RouteService>(
       builder: (context, routeService, child) {
-        final unacknowledgedDeviations = routeService.getUnacknowledgedDeviations();
-        
+        final unacknowledgedDeviations = routeService
+            .getUnacknowledgedDeviations();
+
         if (unacknowledgedDeviations.isEmpty || !routeService.isTrackingRoute) {
           return const SizedBox.shrink();
         }
@@ -30,7 +31,9 @@ class RouteDeviationBanner extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: _getAccentColor(mostSevereDeviation.type).withOpacity(0.3),
+                color: _getAccentColor(
+                  mostSevereDeviation.type,
+                ).withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -39,7 +42,11 @@ class RouteDeviationBanner extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => _showDeviationAlert(context, mostSevereDeviation, routeService),
+              onTap: () => _showDeviationAlert(
+                context,
+                mostSevereDeviation,
+                routeService,
+              ),
               borderRadius: BorderRadius.circular(12),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -49,7 +56,9 @@ class RouteDeviationBanner extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: _getAccentColor(mostSevereDeviation.type).withOpacity(0.2),
+                        color: _getAccentColor(
+                          mostSevereDeviation.type,
+                        ).withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -77,7 +86,9 @@ class RouteDeviationBanner extends StatelessWidget {
                             '${mostSevereDeviation.deviationDistance.toStringAsFixed(0)}m from planned route',
                             style: TextStyle(
                               fontSize: 12,
-                              color: _getTextColor(mostSevereDeviation.type).withOpacity(0.8),
+                              color: _getTextColor(
+                                mostSevereDeviation.type,
+                              ).withOpacity(0.8),
                             ),
                           ),
                         ],

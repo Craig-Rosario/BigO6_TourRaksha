@@ -32,7 +32,9 @@ class TripRoute {
           .map((point) => LatLng(point['lat'], point['lng']))
           .toList(),
       totalDistance: json['totalDistance']?.toDouble() ?? 0.0,
-      estimatedDuration: Duration(seconds: json['estimatedDurationSeconds'] ?? 0),
+      estimatedDuration: Duration(
+        seconds: json['estimatedDurationSeconds'] ?? 0,
+      ),
       createdAt: DateTime.parse(json['createdAt']),
       isActive: json['isActive'] ?? true,
     );

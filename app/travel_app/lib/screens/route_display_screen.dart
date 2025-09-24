@@ -40,23 +40,19 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
       body: Consumer<RouteService>(
         builder: (context, routeService, child) {
           final route = routeService.currentRoute;
-          
+
           if (route == null) {
-            return const Center(
-              child: Text('No route available'),
-            );
+            return const Center(child: Text('No route available'));
           }
 
           return Column(
             children: [
               // Route summary card
               _buildRouteSummaryCard(route),
-              
+
               // Map
-              Expanded(
-                child: _buildRouteMap(route, routeService),
-              ),
-              
+              Expanded(child: _buildRouteMap(route, routeService)),
+
               // Control buttons
               _buildControlButtons(routeService, route),
             ],
@@ -76,17 +72,11 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.route,
-                  color: Theme.of(context).primaryColor,
-                ),
+                Icon(Icons.route, color: Theme.of(context).primaryColor),
                 const SizedBox(width: 8),
                 const Text(
                   'Route Summary',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -126,20 +116,11 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
       children: [
         Icon(icon, color: Colors.grey[600]),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -148,7 +129,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
   Widget _buildRouteMap(TripRoute route, RouteService routeService) {
     // Calculate bounds for the route
     final bounds = _calculateRouteBounds(route);
-    
+
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
@@ -164,7 +145,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.tourraksha.app',
         ),
-        
+
         // Route polyline
         PolylineLayer(
           polylines: [
@@ -175,7 +156,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
             ),
           ],
         ),
-        
+
         // Waypoint markers
         MarkerLayer(
           markers: route.waypoints.map((waypoint) {
@@ -185,11 +166,13 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
             );
           }).toList(),
         ),
-        
+
         // Deviation alerts
         if (routeService.getUnacknowledgedDeviations().isNotEmpty)
           MarkerLayer(
-            markers: routeService.getUnacknowledgedDeviations().map((deviation) {
+            markers: routeService.getUnacknowledgedDeviations().map((
+              deviation,
+            ) {
               return Marker(
                 point: deviation.currentLocation,
                 child: _buildDeviationMarker(deviation),
@@ -203,7 +186,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
   Widget _buildWaypointMarker(RouteWaypoint waypoint) {
     Color markerColor;
     IconData markerIcon;
-    
+
     switch (waypoint.type) {
       case WaypointType.start:
         markerColor = Colors.green;
@@ -226,7 +209,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
         markerIcon = Icons.local_hospital;
         break;
     }
-    
+
     return Container(
       width: 40,
       height: 40,
@@ -242,11 +225,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
           ),
         ],
       ),
-      child: Icon(
-        markerIcon,
-        color: Colors.white,
-        size: 20,
-      ),
+      child: Icon(markerIcon, color: Colors.white, size: 20),
     );
   }
 
@@ -265,7 +244,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
       default:
         alertColor = Colors.grey;
     }
-    
+
     return Container(
       width: 30,
       height: 30,
@@ -274,11 +253,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
       ),
-      child: const Icon(
-        Icons.warning,
-        color: Colors.white,
-        size: 16,
-      ),
+      child: const Icon(Icons.warning, color: Colors.white, size: 16),
     );
   }
 
@@ -325,11 +300,12 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
               ],
             ),
           ],
-          
+
           // Show deviation alerts
           Consumer<RouteService>(
             builder: (context, routeService, child) {
-              final unacknowledgedDeviations = routeService.getUnacknowledgedDeviations();
+              final unacknowledgedDeviations = routeService
+                  .getUnacknowledgedDeviations();
               if (unacknowledgedDeviations.isNotEmpty) {
                 return Container(
                   margin: const EdgeInsets.only(top: 8),
@@ -374,7 +350,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
       setState(() {
         _isTrackingStarted = true;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Route tracking started'),
@@ -396,7 +372,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
     setState(() {
       _isTrackingStarted = false;
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Route tracking stopped'),
@@ -408,9 +384,9 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
   void _showRouteDetails() {
     final routeService = context.read<RouteService>();
     final route = routeService.currentRoute;
-    
+
     if (route == null) return;
-    
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -421,15 +397,16 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
           children: [
             const Text(
               'Route Details',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Text('Trip ID: ${route.tripId}'),
-            Text('Total Distance: ${route.totalDistance.toStringAsFixed(2)} km'),
-            Text('Estimated Duration: ${_formatDuration(route.estimatedDuration)}'),
+            Text(
+              'Total Distance: ${route.totalDistance.toStringAsFixed(2)} km',
+            ),
+            Text(
+              'Estimated Duration: ${_formatDuration(route.estimatedDuration)}',
+            ),
             Text('Waypoints: ${route.waypoints.length}'),
             Text('Created: ${route.createdAt.toString().split('.')[0]}'),
           ],
@@ -441,9 +418,9 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
   void _showWaypointsList() {
     final routeService = context.read<RouteService>();
     final route = routeService.currentRoute;
-    
+
     if (route == null) return;
-    
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -454,10 +431,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
           children: [
             const Text(
               'Waypoints',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Flexible(
@@ -488,7 +462,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
   void _showDeviationAlerts() {
     final routeService = context.read<RouteService>();
     final deviations = routeService.getUnacknowledgedDeviations();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -520,8 +494,12 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text('Distance from route: ${deviation.deviationDistance.toStringAsFixed(0)}m'),
-                    Text('Detected: ${deviation.detectedAt.toString().split('.')[0]}'),
+                    Text(
+                      'Distance from route: ${deviation.deviationDistance.toStringAsFixed(0)}m',
+                    ),
+                    Text(
+                      'Detected: ${deviation.detectedAt.toString().split('.')[0]}',
+                    ),
                   ],
                 ),
               ),
@@ -586,7 +564,7 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m';
     } else {
@@ -596,28 +574,22 @@ class _RouteDisplayScreenState extends State<RouteDisplayScreen> {
 
   LatLngBounds _calculateRouteBounds(TripRoute route) {
     if (route.routePolyline.isEmpty) {
-      return LatLngBounds(
-        const LatLng(0, 0),
-        const LatLng(0, 0),
-      );
+      return LatLngBounds(const LatLng(0, 0), const LatLng(0, 0));
     }
-    
+
     double minLat = route.routePolyline.first.latitude;
     double maxLat = route.routePolyline.first.latitude;
     double minLng = route.routePolyline.first.longitude;
     double maxLng = route.routePolyline.first.longitude;
-    
+
     for (final point in route.routePolyline) {
       minLat = minLat < point.latitude ? minLat : point.latitude;
       maxLat = maxLat > point.latitude ? maxLat : point.latitude;
       minLng = minLng < point.longitude ? minLng : point.longitude;
       maxLng = maxLng > point.longitude ? maxLng : point.longitude;
     }
-    
-    return LatLngBounds(
-      LatLng(minLat, minLng),
-      LatLng(maxLat, maxLng),
-    );
+
+    return LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
   }
 
   @override

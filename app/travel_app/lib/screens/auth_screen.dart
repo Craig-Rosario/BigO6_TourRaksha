@@ -7,11 +7,8 @@ import '../widgets/tour_raksha_logo.dart';
 
 class AuthScreen extends StatefulWidget {
   final String? initialType; // 'login' or 'register'
-  
-  const AuthScreen({
-    super.key, 
-    this.initialType,
-  });
+
+  const AuthScreen({super.key, this.initialType});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -34,19 +31,21 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   void initState() {
     super.initState();
-    
+
     // Set initial type based on parameter
     _currentType = widget.initialType ?? 'register';
-    print('AuthScreen: initialType = ${widget.initialType}, _currentType = $_currentType');
-    
+    print(
+      'AuthScreen: initialType = ${widget.initialType}, _currentType = $_currentType',
+    );
+
     _tabController = TabController(
-      length: 2, 
+      length: 2,
       vsync: this,
       initialIndex: _currentType == 'login' ? 1 : 0,
     );
-    
+
     print('AuthScreen: TabController initialIndex = ${_tabController.index}');
-    
+
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         final newType = _tabController.index == 0 ? 'register' : 'login';
@@ -140,27 +139,31 @@ class _AuthScreenState extends State<AuthScreen>
             print('OTP Verification result: $result');
             print('User data: $data');
             print('User ID: ${data?['userId']}');
-            
+
             // Add more specific debugging
             if (data == null) {
               print('ERROR: data is null from OTP verification');
               setState(() {
-                _errorMessage = 'Registration failed: No user data received. Please try again.';
+                _errorMessage =
+                    'Registration failed: No user data received. Please try again.';
               });
               return;
             }
-            
+
             if (data['userId'] == null) {
               print('ERROR: userId is null in data: $data');
               setState(() {
-                _errorMessage = 'Registration failed: User ID not received. Please try again.';
+                _errorMessage =
+                    'Registration failed: User ID not received. Please try again.';
               });
               return;
             }
 
             // Redirect to registration screen
             if (mounted) {
-              context.pushReplacement('/registration?userId=${data['userId']}&email=${Uri.encodeComponent(data['email'])}');
+              context.pushReplacement(
+                '/registration?userId=${data['userId']}&email=${Uri.encodeComponent(data['email'])}',
+              );
             }
           } else if (_currentType == 'login' && data?['user'] != null) {
             // Redirect to home screen

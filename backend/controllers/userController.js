@@ -1,5 +1,10 @@
 import { PrismaClient } from "../generated/prisma/index.js";
-import { generateOTP, storeOTP, verifyOTP, sendOTPEmail } from "../utils/emailService.js";
+import {
+  generateOTP,
+  storeOTP,
+  verifyOTP,
+  sendOTPEmail,
+} from "../utils/emailService.js";
 
 const prisma = new PrismaClient();
 
@@ -131,39 +136,62 @@ export const updateUser = async (req, res) => {
     const processedData = {};
 
     // Handle string fields
-    const stringFields = ['name', 'phoneNumber', 'address', 'gender', 'bloodGroup', 
-                         'languages', 'nationality', 'passportNumber', 'aadharCardUrl', 
-                         'profileImageUrl', 'emergencyContactName', 'emergencyContactPhone', 
-                         'emergencyContactRelation'];
-    
-    stringFields.forEach(field => {
+    const stringFields = [
+      "name",
+      "phoneNumber",
+      "address",
+      "gender",
+      "bloodGroup",
+      "languages",
+      "nationality",
+      "passportNumber",
+      "aadharCardUrl",
+      "profileImageUrl",
+      "emergencyContactName",
+      "emergencyContactPhone",
+      "emergencyContactRelation",
+    ];
+
+    stringFields.forEach((field) => {
       if (updateData[field] !== undefined) {
-        processedData[field] = updateData[field] ? updateData[field].trim() : null;
+        processedData[field] = updateData[field]
+          ? updateData[field].trim()
+          : null;
       }
     });
 
     // Handle numeric fields
     if (updateData.height !== undefined) {
-      processedData.height = updateData.height ? parseFloat(updateData.height) : null;
+      processedData.height = updateData.height
+        ? parseFloat(updateData.height)
+        : null;
     }
     if (updateData.weight !== undefined) {
-      processedData.weight = updateData.weight ? parseFloat(updateData.weight) : null;
+      processedData.weight = updateData.weight
+        ? parseFloat(updateData.weight)
+        : null;
     }
 
     // Handle boolean fields
     if (updateData.organDonor !== undefined) {
-      processedData.organDonor = updateData.organDonor === true || updateData.organDonor === 'true';
+      processedData.organDonor =
+        updateData.organDonor === true || updateData.organDonor === "true";
     }
     if (updateData.isKycVerified !== undefined) {
-      processedData.isKycVerified = updateData.isKycVerified === true || updateData.isKycVerified === 'true';
+      processedData.isKycVerified =
+        updateData.isKycVerified === true ||
+        updateData.isKycVerified === "true";
     }
     if (updateData.isActive !== undefined) {
-      processedData.isActive = updateData.isActive === true || updateData.isActive === 'true';
+      processedData.isActive =
+        updateData.isActive === true || updateData.isActive === "true";
     }
 
     // Handle date fields
     if (updateData.dateOfBirth !== undefined) {
-      processedData.dateOfBirth = updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : null;
+      processedData.dateOfBirth = updateData.dateOfBirth
+        ? new Date(updateData.dateOfBirth)
+        : null;
     }
 
     // Validate email format if provided
@@ -173,7 +201,7 @@ export const updateUser = async (req, res) => {
         if (!emailRegex.test(updateData.email)) {
           return res.status(400).json({
             success: false,
-            message: "Invalid email format"
+            message: "Invalid email format",
           });
         }
         processedData.email = updateData.email.trim().toLowerCase();
@@ -183,10 +211,13 @@ export const updateUser = async (req, res) => {
     }
 
     // Validate phone number format if provided
-    if (processedData.phoneNumber && !/^\+?[\d\s\-\(\)]+$/.test(processedData.phoneNumber)) {
+    if (
+      processedData.phoneNumber &&
+      !/^\+?[\d\s\-\(\)]+$/.test(processedData.phoneNumber)
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Invalid phone number format"
+        message: "Invalid phone number format",
       });
     }
 
@@ -196,14 +227,14 @@ export const updateUser = async (req, res) => {
       include: {
         trips: {
           where: { status: "active" },
-          take: 5
+          take: 5,
         },
         alerts: {
           where: { isResolved: false },
-          take: 5
+          take: 5,
         },
-        digitalID: true
-      }
+        digitalID: true,
+      },
     });
 
     // Remove sensitive information
@@ -279,14 +310,14 @@ export const sendEmailOTP = async (req, res) => {
     if (!email) {
       return res.status(400).json({
         success: false,
-        message: "Email is required"
+        message: "Email is required",
       });
     }
 
-    if (!type || !['login', 'register'].includes(type)) {
+    if (!type || !["login", "register"].includes(type)) {
       return res.status(400).json({
         success: false,
-        message: "Type must be either 'login' or 'register'"
+        message: "Type must be either 'login' or 'register'",
       });
     }
 
@@ -295,19 +326,19 @@ export const sendEmailOTP = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid email format"
+        message: "Invalid email format",
       });
     }
 
     // Check if user exists with this email
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
-    if (type === 'register' && existingUser) {
+    if (type === "register" && existingUser) {
       return res.status(400).json({
         success: false,
-        message: "User with this email already exists"
+        message: "User with this email already exists",
       });
     }
 
@@ -319,19 +350,21 @@ export const sendEmailOTP = async (req, res) => {
     storeOTP(email, otp);
 
     // Send OTP via email
-    await sendOTPEmail(email, otp, type === 'login' ? 'login' : 'registration');
+    await sendOTPEmail(email, otp, type === "login" ? "login" : "registration");
 
     res.json({
       success: true,
-      message: `${type === 'login' ? 'Login' : 'Registration'} OTP sent to email successfully`,
-      data: { type }
+      message: `${
+        type === "login" ? "Login" : "Registration"
+      } OTP sent to email successfully`,
+      data: { type },
     });
   } catch (error) {
     console.error("Error sending email OTP:", error);
     res.status(500).json({
       success: false,
       message: "Failed to send OTP",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -344,14 +377,14 @@ export const verifyEmailOTP = async (req, res) => {
     if (!email || !otp) {
       return res.status(400).json({
         success: false,
-        message: "Email and OTP are required"
+        message: "Email and OTP are required",
       });
     }
 
-    if (!type || !['login', 'register'].includes(type)) {
+    if (!type || !["login", "register"].includes(type)) {
       return res.status(400).json({
         success: false,
-        message: "Type must be either 'login' or 'register'"
+        message: "Type must be either 'login' or 'register'",
       });
     }
 
@@ -361,92 +394,95 @@ export const verifyEmailOTP = async (req, res) => {
     if (!verification.valid) {
       return res.status(400).json({
         success: false,
-        message: verification.message
+        message: verification.message,
       });
     }
 
-    if (type === 'register') {
+    if (type === "register") {
       // Check if user already exists
       let user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
       });
 
       if (user) {
         // User already exists, check if profile is complete
-        const isProfileComplete = user.name && user.phoneNumber && user.nationality;
-        
+        const isProfileComplete =
+          user.name && user.phoneNumber && user.nationality;
+
         res.json({
           success: true,
           message: "Email verified successfully",
-          data: { 
-            userId: user.id, 
+          data: {
+            userId: user.id,
             email: user.email,
-            type: 'register',
-            requiresRegistration: !isProfileComplete
-          }
+            type: "register",
+            requiresRegistration: !isProfileComplete,
+          },
         });
       } else {
         // Create a minimal user with just the email for registration
         user = await prisma.user.create({
-          data: { email }
+          data: { email },
         });
 
         res.status(201).json({
           success: true,
           message: "Email verified successfully",
-          data: { 
-            userId: user.id, 
+          data: {
+            userId: user.id,
             email: user.email,
-            type: 'register',
-            requiresRegistration: true
-          }
+            type: "register",
+            requiresRegistration: true,
+          },
         });
       }
-    } else if (type === 'login') {
+    } else if (type === "login") {
       // Check if user exists
       let user = await prisma.user.findUnique({
         where: { email },
         include: {
           trips: {
             where: { status: "active" },
-            orderBy: { createdAt: "desc" }
+            orderBy: { createdAt: "desc" },
           },
           alerts: {
             where: { isResolved: false },
             orderBy: { createdAt: "desc" },
-            take: 5
+            take: 5,
           },
           safetyScores: {
             orderBy: { createdAt: "desc" },
-            take: 1
-          }
-        }
+            take: 1,
+          },
+        },
       });
 
       if (!user) {
         // User doesn't exist, create minimal user for registration flow
         user = await prisma.user.create({
-          data: { email }
+          data: { email },
         });
 
         res.status(201).json({
           success: true,
-          message: "Email verified successfully. Please complete your registration.",
-          data: { 
-            userId: user.id, 
+          message:
+            "Email verified successfully. Please complete your registration.",
+          data: {
+            userId: user.id,
             email: user.email,
-            type: 'login',
-            requiresRegistration: true
-          }
+            type: "login",
+            requiresRegistration: true,
+          },
         });
       } else {
         // Check if user profile is complete
-        const isProfileComplete = user.name && user.phoneNumber && user.nationality;
+        const isProfileComplete =
+          user.name && user.phoneNumber && user.nationality;
 
         // Update last login timestamp
         await prisma.user.update({
           where: { id: user.id },
-          data: { updatedAt: new Date() }
+          data: { updatedAt: new Date() },
         });
 
         // Return user data (excluding sensitive information)
@@ -457,10 +493,10 @@ export const verifyEmailOTP = async (req, res) => {
           message: "Login successful",
           data: {
             user: userData,
-            type: 'login',
+            type: "login",
             requiresRegistration: !isProfileComplete,
-            loginTime: new Date().toISOString()
-          }
+            loginTime: new Date().toISOString(),
+          },
         });
       }
     }
@@ -470,7 +506,7 @@ export const verifyEmailOTP = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to verify email",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -482,13 +518,15 @@ export const completeUserRegistration = async (req, res) => {
     const userData = req.body;
 
     // Validate required fields for complete registration
-    const requiredFields = ['name', 'phoneNumber', 'nationality'];
-    const missingFields = requiredFields.filter(field => !userData[field]?.trim());
-    
+    const requiredFields = ["name", "phoneNumber", "nationality"];
+    const missingFields = requiredFields.filter(
+      (field) => !userData[field]?.trim()
+    );
+
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
-        message: `Missing required fields: ${missingFields.join(', ')}`
+        message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
 
@@ -501,19 +539,28 @@ export const completeUserRegistration = async (req, res) => {
       // Ensure proper data types for numeric fields
       height: updateData.height ? parseFloat(updateData.height) : null,
       weight: updateData.weight ? parseFloat(updateData.weight) : null,
-      
+
       // Ensure boolean fields are properly handled
-      organDonor: updateData.organDonor === true || updateData.organDonor === 'true',
-      isKycVerified: updateData.isKycVerified === true || updateData.isKycVerified === 'true',
-      
+      organDonor:
+        updateData.organDonor === true || updateData.organDonor === "true",
+      isKycVerified:
+        updateData.isKycVerified === true ||
+        updateData.isKycVerified === "true",
+
       // Ensure date fields are properly handled
-      dateOfBirth: updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : null,
-      
+      dateOfBirth: updateData.dateOfBirth
+        ? new Date(updateData.dateOfBirth)
+        : null,
+
       // Map emergency contact fields to match schema
-      emergencyContactName: updateData.emergencyContact || updateData.emergencyContactName,
-      emergencyContactPhone: updateData.emergencyContactNumber || updateData.emergencyContactPhone,
-      emergencyContactRelation: updateData.emergencyContactRelationship || updateData.emergencyContactRelation,
-      
+      emergencyContactName:
+        updateData.emergencyContact || updateData.emergencyContactName,
+      emergencyContactPhone:
+        updateData.emergencyContactNumber || updateData.emergencyContactPhone,
+      emergencyContactRelation:
+        updateData.emergencyContactRelationship ||
+        updateData.emergencyContactRelation,
+
       // Remove the old field names to avoid conflicts
       emergencyContact: undefined,
       emergencyContactNumber: undefined,
@@ -521,16 +568,16 @@ export const completeUserRegistration = async (req, res) => {
     };
 
     // Remove undefined values to avoid Prisma issues
-    Object.keys(processedData).forEach(key => {
+    Object.keys(processedData).forEach((key) => {
       if (processedData[key] === undefined) {
         delete processedData[key];
       }
     });
 
-    console.log('Processing user registration data:', {
+    console.log("Processing user registration data:", {
       userId: id,
       fields: Object.keys(processedData),
-      hasDateOfBirth: !!processedData.dateOfBirth
+      hasDateOfBirth: !!processedData.dateOfBirth,
     });
 
     // Update the user with the additional information
@@ -538,20 +585,23 @@ export const completeUserRegistration = async (req, res) => {
       where: { id },
       data: processedData,
       include: {
-        digitalID: true
-      }
+        digitalID: true,
+      },
     });
 
     // Create Digital ID if it doesn't exist
     let digitalID = user.digitalID;
     if (!digitalID) {
-      const idNumber = `TID${Date.now()}${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const idNumber = `TID${Date.now()}${Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase()}`;
       digitalID = await prisma.digitalID.create({
         data: {
           userId: user.id,
           idNumber,
-          status: 'active'
-        }
+          status: "active",
+        },
       });
     }
 
@@ -563,8 +613,8 @@ export const completeUserRegistration = async (req, res) => {
       message: "User registration completed successfully",
       data: {
         ...userResponse,
-        digitalID
-      }
+        digitalID,
+      },
     });
   } catch (error) {
     console.error("Error completing user registration:", error);
@@ -572,7 +622,7 @@ export const completeUserRegistration = async (req, res) => {
     if (error.code === "P2025") {
       return res.status(404).json({
         success: false,
-        message: "User not found"
+        message: "User not found",
       });
     }
 
@@ -580,19 +630,17 @@ export const completeUserRegistration = async (req, res) => {
     if (error.code === "P2002") {
       return res.status(400).json({
         success: false,
-        message: "A user with this information already exists"
+        message: "A user with this information already exists",
       });
     }
 
     res.status(500).json({
       success: false,
       message: "Failed to complete registration",
-      error: error.message
+      error: error.message,
     });
   }
 };
-
-
 
 // Upload Aadhar card (Mock KYC)
 export const uploadAadharCard = async (req, res) => {
@@ -681,8 +729,8 @@ export const getUserProfileCompleteness = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
-        digitalID: true
-      }
+        digitalID: true,
+      },
     });
 
     if (!user) {
@@ -694,38 +742,42 @@ export const getUserProfileCompleteness = async (req, res) => {
 
     // Define required fields for complete profile
     const requiredFields = {
-      basic: ['name', 'email', 'phoneNumber', 'nationality'],
-      emergency: ['emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelation'],
-      travel: ['passportNumber'],
-      optional: ['dateOfBirth', 'gender', 'address']
+      basic: ["name", "email", "phoneNumber", "nationality"],
+      emergency: [
+        "emergencyContactName",
+        "emergencyContactPhone",
+        "emergencyContactRelation",
+      ],
+      travel: ["passportNumber"],
+      optional: ["dateOfBirth", "gender", "address"],
     };
 
     const completeness = {
       basic: {
         completed: 0,
         total: requiredFields.basic.length,
-        missing: []
+        missing: [],
       },
       emergency: {
         completed: 0,
         total: requiredFields.emergency.length,
-        missing: []
+        missing: [],
       },
       travel: {
         completed: 0,
         total: requiredFields.travel.length,
-        missing: []
+        missing: [],
       },
       optional: {
         completed: 0,
         total: requiredFields.optional.length,
-        missing: []
-      }
+        missing: [],
+      },
     };
 
     // Check each category
-    Object.keys(requiredFields).forEach(category => {
-      requiredFields[category].forEach(field => {
+    Object.keys(requiredFields).forEach((category) => {
+      requiredFields[category].forEach((field) => {
         if (user[field] && user[field].toString().trim()) {
           completeness[category].completed++;
         } else {
@@ -734,13 +786,22 @@ export const getUserProfileCompleteness = async (req, res) => {
       });
     });
 
-    const totalRequired = completeness.basic.total + completeness.emergency.total + completeness.travel.total;
-    const totalCompleted = completeness.basic.completed + completeness.emergency.completed + completeness.travel.completed;
-    const overallPercentage = Math.round((totalCompleted / totalRequired) * 100);
+    const totalRequired =
+      completeness.basic.total +
+      completeness.emergency.total +
+      completeness.travel.total;
+    const totalCompleted =
+      completeness.basic.completed +
+      completeness.emergency.completed +
+      completeness.travel.completed;
+    const overallPercentage = Math.round(
+      (totalCompleted / totalRequired) * 100
+    );
 
-    const isProfileComplete = completeness.basic.missing.length === 0 && 
-                             completeness.emergency.missing.length === 0 && 
-                             completeness.travel.missing.length === 0;
+    const isProfileComplete =
+      completeness.basic.missing.length === 0 &&
+      completeness.emergency.missing.length === 0 &&
+      completeness.travel.missing.length === 0;
 
     res.json({
       success: true,
@@ -772,7 +833,7 @@ export const validateUserData = async (req, res) => {
     if (userData.email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(userData.email)) {
-        errors.push({ field: 'email', message: 'Invalid email format' });
+        errors.push({ field: "email", message: "Invalid email format" });
       }
     }
 
@@ -780,7 +841,10 @@ export const validateUserData = async (req, res) => {
     if (userData.phoneNumber) {
       const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
       if (!phoneRegex.test(userData.phoneNumber)) {
-        errors.push({ field: 'phoneNumber', message: 'Invalid phone number format' });
+        errors.push({
+          field: "phoneNumber",
+          message: "Invalid phone number format",
+        });
       }
     }
 
@@ -789,21 +853,27 @@ export const validateUserData = async (req, res) => {
       const dob = new Date(userData.dateOfBirth);
       const now = new Date();
       const age = now.getFullYear() - dob.getFullYear();
-      
+
       if (isNaN(dob.getTime())) {
-        errors.push({ field: 'dateOfBirth', message: 'Invalid date format' });
+        errors.push({ field: "dateOfBirth", message: "Invalid date format" });
       } else if (age < 10 || age > 120) {
-        errors.push({ field: 'dateOfBirth', message: 'Invalid age range' });
+        errors.push({ field: "dateOfBirth", message: "Invalid age range" });
       }
     }
 
     // Height and weight validation
     if (userData.height && (userData.height < 30 || userData.height > 300)) {
-      errors.push({ field: 'height', message: 'Height must be between 30 and 300 cm' });
+      errors.push({
+        field: "height",
+        message: "Height must be between 30 and 300 cm",
+      });
     }
 
     if (userData.weight && (userData.weight < 10 || userData.weight > 500)) {
-      errors.push({ field: 'weight', message: 'Weight must be between 10 and 500 kg' });
+      errors.push({
+        field: "weight",
+        message: "Weight must be between 10 and 500 kg",
+      });
     }
 
     // Check if email/phone already exists
@@ -815,19 +885,24 @@ export const validateUserData = async (req, res) => {
             {
               OR: [
                 userData.email ? { email: userData.email } : {},
-                userData.phoneNumber ? { phoneNumber: userData.phoneNumber } : {}
-              ].filter(condition => Object.keys(condition).length > 0)
-            }
-          ]
-        }
+                userData.phoneNumber
+                  ? { phoneNumber: userData.phoneNumber }
+                  : {},
+              ].filter((condition) => Object.keys(condition).length > 0),
+            },
+          ],
+        },
       });
 
       if (existingUser) {
         if (existingUser.email === userData.email) {
-          errors.push({ field: 'email', message: 'Email already exists' });
+          errors.push({ field: "email", message: "Email already exists" });
         }
         if (existingUser.phoneNumber === userData.phoneNumber) {
-          errors.push({ field: 'phoneNumber', message: 'Phone number already exists' });
+          errors.push({
+            field: "phoneNumber",
+            message: "Phone number already exists",
+          });
         }
       }
     }
@@ -835,7 +910,7 @@ export const validateUserData = async (req, res) => {
     res.json({
       success: true,
       isValid: errors.length === 0,
-      errors
+      errors,
     });
   } catch (error) {
     console.error("Error validating user data:", error);
